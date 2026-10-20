@@ -1,0 +1,23 @@
+{
+  "_catatan": [
+    "Konfigurasi server MCP untuk klien selain Claude Code (Cursor, Zed, dsb.).",
+    "Salin blok mcpServers ke berkas konfigurasi klien Anda.",
+    "",
+    "Dari klona repositori, command menunjuk peluncur dengan path absolut.",
+    "Kalau terpasang sebagai paket, ganti menjadi:",
+    "    \"command\": \"lppm-mcp\", \"args\": []",
+    "",
+    "Kredensial dibaca dari .env di akar proyek, bukan dari berkas ini.",
+    "LPPM_AKAR_PROYEK menentukan di mana .env, lppm.yaml, dan data/ dicari;",
+    "hapus baris itu kalau .env memang ada di direktori klona."
+  ],
+  "mcpServers": {
+    "lppm-mcp": {
+      "command": "/path/ke/lppm-mcp/lppm",
+      "args": ["mcp"],
+      "env": {
+        "LPPM_AKAR_PROYEK": "/path/ke/ruang-kerja-anda"
+      }
+    }
+  }
+}

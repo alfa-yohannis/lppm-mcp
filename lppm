@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+# Titik masuk LPPM MCP. Virtualenv dan dependensinya disiapkan sendiri pada
+# jalankan pertama.
+#
+#   ./lppm cek-login                    # cek kredensial di .env bisa dipakai login
+#   ./lppm menu                         # menu navigasi portal setelah login
+#   ./lppm halaman /infolppm/profil     # isi satu halaman sebagai teks
+#   ./lppm halaman <path> --tabel       # tabel di halaman itu, baris berkunci nama kolom
+#   ./lppm petakan <path>               # form, tabel, tautan, dan endpoint AJAX satu halaman
+#   ./lppm turnitin                     # jatah dan riwayat pengajuan cek Turnitin
+#   ./lppm turnitin ajukan --judul ... --tautan ...   # uji coba; --kirim untuk mengirim
+#   ./lppm api            # REST API di http://localhost:8000 (PORT=9001 untuk ganti port)
+#   ./lppm mcp            # MCP server lewat stdio
+#   ./lppm uji            # unit test
+#
+# LPPM_PYTHON menentukan interpreter pembuat virtualenv (bawaan: python3).
+
+set -euo pipefail
+
+AKAR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+VENV="${LPPM_VENV:-$AKAR/.venv}"
+PYTHON="$VENV/bin/python"
+
+# Akar proyek menentukan letak .env, lppm.yaml, dan data/, serta titik hitung
+# path relatif. Bawaannya direktori aplikasi ini sendiri; aplikasi tidak pernah
+# menengok ke direktori di atasnya. Ruang kerja yang lebih besar bisa menunjuk
+# direktorinya sendiri lewat LPPM_AKAR_PROYEK sebelum memanggil ini.
+export LPPM_AKAR_PROYEK="${LPPM_AKAR_PROYEK:-$AKAR}"
+
+if [[ ! -x "$PYTHON" ]]; then
+	echo "Membuat virtualenv di $VENV" >&2
+	"${LPPM_PYTHON:-python3}" -m venv "$VENV"
+fi
+
+# penanda ini ikut berubah setiap pyproject.toml disunting, jadi paket baru
+# otomatis terpasang tanpa perlu mengingat menjalankan pip. Dipasang sebagai
+# paket (editable) supaya `import lppm_mcp` berperilaku persis seperti di proyek
+# lain yang memasangnya.
+PENANDA="$VENV/.paket-terpasang"
+if [[ ! -f "$PENANDA" || "$AKAR/pyproject.toml" -nt "$PENANDA" ]]; then
+	echo "Memasang lppm-mcp beserta dependensinya" >&2
+	"$VENV/bin/pip" install --quiet --upgrade pip
+	"$VENV/bin/pip" install --quiet -e "$AKAR[semua]"
+	touch "$PENANDA"
+fi
+
+bantuan() {
+	sed -n '2,16p' "${BASH_SOURCE[0]}" | sed 's/^# \?//'
+	exit 2
+}
+
+PERINTAH="${1:-}"
+[[ -n "$PERINTAH" ]] || bantuan
+shift
+
+case "$PERINTAH" in
+cek-login) exec "$VENV/bin/lppm-cek-login" "$@" ;;
+menu) exec "$VENV/bin/lppm-menu" "$@" ;;
+halaman) exec "$VENV/bin/lppm-halaman" "$@" ;;
+turnitin) exec "$VENV/bin/lppm-turnitin" "$@" ;;
+petakan) exec "$PYTHON" -m lppm_mcp.petakan_form "$@" ;;
+api) exec "$VENV/bin/uvicorn" lppm_mcp.api:app --port "${PORT:-8000}" "$@" ;;
+mcp) exec "$PYTHON" -m lppm_mcp.mcp_server "$@" ;;
+uji) exec "$PYTHON" -m pytest "$AKAR/tests" "$@" ;;
+*) bantuan ;;
+esac

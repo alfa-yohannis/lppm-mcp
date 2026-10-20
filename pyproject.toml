@@ -1,0 +1,55 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lppm-mcp"
+version = "0.1.0"
+description = "Baca portal LPPM Pradita sebagai pustaka Python, CLI, REST API, atau MCP server"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Alfa Yohannis" }]
+keywords = ["lppm", "mcp", "penelitian", "pengabdian", "bkd"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Intended Audience :: Education",
+    "Topic :: Education",
+]
+
+# Hanya yang dibutuhkan pemakaian sebagai pustaka. FastAPI dan mcp ada di extras
+# supaya proyek yang cuma butuh KlienLppm tidak ikut memasang keduanya.
+dependencies = [
+    "requests",
+    "beautifulsoup4",
+    "lxml",
+    "python-dotenv",
+    "pyyaml",
+]
+
+[project.optional-dependencies]
+api = ["fastapi", "uvicorn[standard]"]
+# MCPServer baru ada di mcp 2.x; 1.x memakai nama lama dan tidak bisa dipakai
+mcp = ["mcp>=2"]
+# httpx2 dipakai TestClient Starlette untuk menguji REST API tanpa server
+uji = ["pytest", "httpx2"]
+semua = ["lppm-mcp[api,mcp,uji]"]
+
+[project.urls]
+Homepage = "https://github.com/alfa-yohannis/lppm-mcp"
+Issues = "https://github.com/alfa-yohannis/lppm-mcp/issues"
+
+[project.scripts]
+lppm-cek-login = "lppm_mcp.cli:jalankan_cek_login"
+lppm-menu = "lppm_mcp.cli:jalankan_menu"
+lppm-halaman = "lppm_mcp.cli:jalankan_halaman"
+lppm-turnitin = "lppm_mcp.cli:jalankan_turnitin"
+lppm-petakan = "lppm_mcp.petakan_form:jalankan"
+lppm-mcp = "lppm_mcp.mcp_server:jalankan"
+
+[tool.setuptools.packages.find]
+include = ["lppm_mcp*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

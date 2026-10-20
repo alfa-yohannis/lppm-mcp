@@ -1,0 +1,34 @@
+# Setelan non-rahasia LPPM MCP.
+#
+# Salin ke lppm.yaml lalu ubah yang perlu saja. Semua baris di bawah boleh tetap
+# dikomentari; nilai bawaannya sudah tertulis di tiap baris.
+#
+# Rahasia TIDAK ditaruh di sini. Username dan password ada di .env, yang tidak
+# pernah ikut ter-commit, dan kredensial memang tidak pernah dibaca dari berkas
+# ini. Berkas ini aman dibagikan ke sesama pemakai satu perguruan tinggi.
+#
+# Urutan yang menang: argumen pemanggil -> environment -> .env -> lppm.yaml -> nilai bawaan.
+# Di environment dan .env namanya berawalan LPPM_ dan huruf besar
+# (LPPM_BASE_URL); di berkas ini tanpa awalan dan huruf kecil (base_url).
+
+# --- Portal LPPM -----------------------------------------------------------
+# Ganti kalau portalnya pindah alamat. Cukup isi salah satu: website (alamat
+# halaman login, sama dengan LPPM_WEBSITE di .env) atau base_url.
+# base_url: https://lppm.pradita.ac.id
+# website: https://lppm.pradita.ac.id/login
+# nama_instansi: Pradita          # hanya label pada judul API dan instruksi MCP
+
+# Nama isian username pada form login. Biarkan dikomentari supaya dikenali dari
+# formnya sendiri; per Oktober 2026 namanya "login" (berlabel "NIDN atau Email
+# Address"). Isi hanya kalau pengenalan otomatisnya salah pilih.
+# field_username: login
+
+# --- Batas waktu jaringan --------------------------------------------------
+# Naikkan kalau jaringan ke portal lambat.
+# batas_login_detik: 60
+# batas_halaman_detik: 120
+# maks_pengalihan: 10             # pengalihan (redirect) yang diikuti per permintaan
+
+# --- Lain-lain -------------------------------------------------------------
+# umur_sesi_detik: 900            # lama sesi login disimpan REST API
+# user_agent: "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
